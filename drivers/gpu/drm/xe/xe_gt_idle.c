@@ -112,10 +112,15 @@ void xe_gt_idle_enable_pg(struct xe_gt *gt)
 
 	pg_enable = RENDER_POWERGATE_ENABLE | MEDIA_POWERGATE_ENABLE;
 
-	for (i = XE_HW_ENGINE_VCS0, j = 0; i <= XE_HW_ENGINE_VCS7; ++i, ++j) {
-		if ((gt->info.engine_mask & BIT(i)))
-			pg_enable |= (VDN_HCP_POWERGATE_ENABLE(j) |
-				      VDN_MFXVDENC_POWERGATE_ENABLE(j));
+	/* Sub-pipe PG is not present on DG1. Setting these bits can disable
+	 * other power gates and cause GPU hangs on video playbacks.
+	 */
+	if (xe->info.platform != XE_DG1) {
+		for (i = XE_HW_ENGINE_VCS0, j = 0; i <= XE_HW_ENGINE_VCS7; ++i, ++j) {
+			if ((gt->info.engine_mask & BIT(i)))
+				gtidle->powergate_enable |= (VDN_HCP_POWERGATE_ENABLE(j) |
+							     VDN_MFXVDENC_POWERGATE_ENABLE(j));
+		}
 	}
 
 	XE_WARN_ON(xe_force_wake_get(gt_to_fw(gt), XE_FW_GT));
