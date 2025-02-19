@@ -118,8 +118,8 @@ void xe_gt_idle_enable_pg(struct xe_gt *gt)
 	if (xe->info.platform != XE_DG1) {
 		for (i = XE_HW_ENGINE_VCS0, j = 0; i <= XE_HW_ENGINE_VCS7; ++i, ++j) {
 			if ((gt->info.engine_mask & BIT(i)))
-				gtidle->powergate_enable |= (VDN_HCP_POWERGATE_ENABLE(j) |
-							     VDN_MFXVDENC_POWERGATE_ENABLE(j));
+				pg_enable |= (VDN_HCP_POWERGATE_ENABLE(j) |
+					      VDN_MFXVDENC_POWERGATE_ENABLE(j));
 		}
 	}
 
